@@ -1,0 +1,4 @@
+nClientes 100
+nServidores 50
+bufferSize 70
+solicitudesCliente 100
