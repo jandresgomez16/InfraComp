@@ -24,8 +24,8 @@ public class Buffer {
         }
         cola.add(mensaje);
 
-        //notifica a los threads del servidor de que se han agregado elementos a la cola
-        this.notifyAll();
+        //notifica a un servidor thread para que procese el mensaje
+        this.notify();
 
         return true;
     }
@@ -38,23 +38,28 @@ public class Buffer {
         return mensaje;
     }
 
-    //cantidad de mensajes en la cola
+    //Cantidad de mensajes en la cola
     public synchronized int cantidadMensajes() {
         return cola.size();
     }
 
-    //cantidad de clientes que tienen al menus una solicitud no procesada o sin enviar
+    //Cantidad de clientes que tienen al menus una solicitud no procesada o sin enviar
     public synchronized int cantidadClientes() {
         synchronized (clientesActivos) {
             return clientesActivos;
         }
     }
 
+    //reduce la cantidad de clientes activos
     public void apagarCliente() {
         synchronized (clientesActivos) {
             clientesActivos -= 1;
-            synchronized (this) {
-                this.notifyAll();
+
+            //Notifica a los thread servidor que puedan estar dormidos que ya no hay mas clientes que antender, para que despierten y terminen su ejecucion
+            if(clientesActivos == 0){
+                synchronized (this) {
+                    this.notifyAll();
+                }
             }
         }
     }
